@@ -28,6 +28,7 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/public/**").permitAll() // Allow /user without authentication
                         .requestMatchers("/journal/**", "/user").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
