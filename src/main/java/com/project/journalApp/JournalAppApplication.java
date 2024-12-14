@@ -2,6 +2,7 @@ package com.project.journalApp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -15,8 +16,9 @@ public class JournalAppApplication {
 		SpringApplication.run(JournalAppApplication.class, args);
 	}
 
-	// dbFactory makes a connection between  application and the database
-	public PlatformTransactionManager add(MongoDatabaseFactory dbFactory){
+    // dbFactory makes a connection between  application and the database
+    @Bean
+    public PlatformTransactionManager add(MongoDatabaseFactory dbFactory){
 		return new MongoTransactionManager(dbFactory);
 	}
 
