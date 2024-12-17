@@ -7,12 +7,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.journalApp.apiResponse.WeatherResponse;
 import com.project.journalApp.entity.User;
 import com.project.journalApp.repository.UserRepository;
 import com.project.journalApp.service.UserService;
+import com.project.journalApp.service.WeatherService;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 
 
@@ -25,6 +31,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private WeatherService weatherService;
 
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody User user) {
@@ -53,7 +62,26 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    
+    @GetMapping("/{city}")
+    public ResponseEntity<?> greeting(@PathVariable String city) {
+    org.springframework.security.core.Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+    try {
+        // Fetch weather data
+        WeatherResponse weatherResponse = weatherService.getWeather(city);
 
+        // Check if weatherResponse or its current object is null
+        if (weatherResponse == null || weatherResponse.getCurrent() == null) {
+            return new ResponseEntity<>("Weather data is unavailable for city: " + city, HttpStatus.NOT_FOUND);
+        }
+
+        // Get the "feels like" value
+        int feelsLike = weatherResponse.getCurrent().getFeelslike();
+        return new ResponseEntity<>("Hi " + authentication.getName() + ", Weather feels like " + feelsLike, HttpStatus.OK);
+
+    } catch (Exception e) {
+        // Handle any unexpected errors
+        return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    }
 }
